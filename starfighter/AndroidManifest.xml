@@ -6,7 +6,7 @@
 
     <uses-sdk
         android:minSdkVersion="8"
-        android:targetSdkVersion="18" />
+        android:targetSdkVersion="19" />
 
     <application
         android:allowBackup="true"
@@ -26,6 +26,7 @@
         </activity>
         <activity android:screenOrientation="portrait" android:name="SFMainMenu"></activity>
         <service android:name="SFMusic"></service>
+        <activity android:screenOrientation="portrait" android:name="SFGame"></activity>
     </application>
 
 </manifest>
