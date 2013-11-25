@@ -12,6 +12,21 @@ public class SFGame extends Activity {
 		gameView = new SFGameView(this);
 		setContentView(gameView);
 	}
+	
+	
+	//obnova hry , napr z tel. hovoru
+	@Override
+	protected void onResume(){
+		super.onResume();
+		gameView.onResume();
+	}
+	
+	//pauza
+	@Override
+	protected void onPause(){
+		super.onPause();
+		gameView.onPause();
+	}
 
 	
 }
