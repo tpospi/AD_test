@@ -10,7 +10,81 @@ public class SFGameRender implements Renderer {
 	private float bgScroll1; //uchovava pozici pozadi
 	private SFBackground background2 = new SFBackground();
 	private float bgScroll2; //uchovava pozici pozadi
+	private SFGoodGuy player1 = new SFGoodGuy(); //vytvoreni nove instance postavy
+	private int goodGuyBankFrames = 0; //promena na pocitani iteraci herniho cyklu od posledni zmeny pozice ve spritu postavy
 
+	/**
+	 * Ustredni metoda pro pohyb hrace
+	 * */
+	private void movePlayer1(GL10 gl){
+		switch (SFEngine.playerFlightAction){
+		case SFEngine.PLAYER_BANK_LEFT_1:
+			//rezim pohybu po ose x - modelova matice
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			gl.glLoadIdentity();
+			gl.glPushMatrix();
+			gl.glScalef(0.25f, 0.25f, 0.25f);
+			//pohyb
+			if (SFEngine.playerBankPosX>0){ //testovani kde je hrac
+			SFEngine.playerBankPosX-=SFEngine.PLAYER_BANK_SPEED;
+			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
+			
+			//rezim posunuti textury na spravny sprite
+			gl.glMatrixMode(GL10.GL_TEXTURE);
+			gl.glLoadIdentity();
+			gl.glTranslatef(0.75f, 0.0f, 0.0f); //sprite poloha na texture
+			goodGuyBankFrames+=1; //inkrementace pro zjisteni na to kdy prejit na dalsi sprit
+			}
+			else { //hrac je na levem kraji obrazovky
+				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
+				//rezim posunuti textury na spravny sprite
+				gl.glMatrixMode(GL10.GL_TEXTURE);
+				gl.glLoadIdentity();
+				gl.glTranslatef(0.0f, 0.0f, 0.0f); //sprite poloha na texture
+			}
+			
+			player1.draw(gl);
+			gl.glPopMatrix();
+			gl.glLoadIdentity();
+			
+			break;
+			
+		case SFEngine.PLAYER_BANK_RIGHT_1:
+			break;
+			
+		case SFEngine.PLAYER_RELEASE: //zatim se deje to same jako by hrac nic nedelal. proste po uvolneni tlacitka se zobrazi prvni sprit
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			gl.glLoadIdentity();
+			gl.glPushMatrix();
+			gl.glScalef(0.25f, 0.25f, 1f); //scale hrace na 25procent
+			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f); //pozice aktualni. nedochazi k pohybu
+			gl.glMatrixMode(GL10.GL_TEXTURE);
+			gl.glLoadIdentity();
+			gl.glTranslatef(0f, 0f, 0f);
+			
+			player1.draw(gl);
+			gl.glPopMatrix();
+			gl.glLoadIdentity();
+			goodGuyBankFrames+=1; //pocitame snimky od uvolneni
+			break;
+			
+		default:
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			gl.glLoadIdentity();
+			gl.glPushMatrix();
+			gl.glScalef(0.25f, 0.25f, 1f); //scale hrace na 25procent
+			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f); //pozice aktualni. nedochazi k pohybu
+			gl.glMatrixMode(GL10.GL_TEXTURE);
+			gl.glLoadIdentity();
+			gl.glTranslatef(0f, 0f, 0f);
+			
+			player1.draw(gl);
+			gl.glPopMatrix();
+			gl.glLoadIdentity();
+		break;
+		}
+	}
+	
 	private void scrollBackground1(GL10 gl){
 		if (bgScroll1 == Float.MAX_VALUE) //nesmi presahnout float max hodnutu
 			bgScroll1 =0f;
@@ -102,6 +176,7 @@ public class SFGameRender implements Renderer {
 		
 		background.loadTexture(gl, SFEngine.BACKGROUND_LAYER_ONE, SFEngine.context);/*nahreajeme texturu pozadi*/
 		background2.loadTexture(gl, SFEngine.BACKGROUND_LAYER_TWO, SFEngine.context);/*nahreajeme texturu pozadi*/
+		player1.loadTexture(gl, SFEngine.PLAYER_SHIP, SFEngine.context);/*nahreajeme texturu pozadi*/
 		
 	}
 
