@@ -24,7 +24,7 @@ public class SFGameRender implements Renderer {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glPushMatrix();
-			gl.glScalef(0.25f, 0.25f, 0.25f);
+			gl.glScalef(0.25f, 0.25f, 1f);
 			//pohyb
 			if (SFEngine.playerBankPosX>0 && goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { //testovani kde je hrac
 			SFEngine.playerBankPosX-=SFEngine.PLAYER_BANK_SPEED;
@@ -59,6 +59,41 @@ public class SFGameRender implements Renderer {
 			break;
 			
 		case SFEngine.PLAYER_BANK_RIGHT_1:
+			//rezim pohybu po ose x - modelova matice
+			gl.glMatrixMode(GL10.GL_MODELVIEW);
+			gl.glLoadIdentity();
+			gl.glPushMatrix();
+			gl.glScalef(0.25f, 0.25f, 1f);
+			//pohyb
+			if (SFEngine.playerBankPosX<3 && goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { //testovani kde je hrac
+			SFEngine.playerBankPosX+=SFEngine.PLAYER_BANK_SPEED;
+			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
+			
+			//rezim posunuti textury na spravny sprite
+			gl.glMatrixMode(GL10.GL_TEXTURE);
+			gl.glLoadIdentity();
+			gl.glTranslatef(0.25f, 0.0f, 0.0f); //sprite poloha na texture
+			goodGuyBankFrames+=1; //inkrementace pro zjisteni na to kdy prejit na dalsi sprit
+			} else if (SFEngine.playerBankPosX > 0 && goodGuyBankFrames >= SFEngine.PLAYER_FRAMES_BETWEEN_ANI){ //pokud neni na kraji ale uplynulo 9 snimku - naklon cislo 2
+				SFEngine.playerBankPosX +=SFEngine.PLAYER_BANK_SPEED;
+				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
+				//rezim posunuti textury na spravny sprite
+				gl.glMatrixMode(GL10.GL_TEXTURE);
+				gl.glLoadIdentity();
+				gl.glTranslatef(0.50f, 0.0f, 0.0f); //sprite poloha left 2 na texture
+				
+			}
+			else { //hrac je na levem kraji obrazovky
+				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
+				//rezim posunuti textury na spravny sprite
+				gl.glMatrixMode(GL10.GL_TEXTURE);
+				gl.glLoadIdentity();
+				gl.glTranslatef(0.0f, 0.0f, 0.0f); //sprite poloha na texture
+			}
+			
+			player1.draw(gl);
+			gl.glPopMatrix();
+			gl.glLoadIdentity();
 			break;
 			
 		case SFEngine.PLAYER_RELEASE: //zatim se deje to same jako by hrac nic nedelal. proste po uvolneni tlacitka se zobrazi prvni sprit
