@@ -16,6 +16,10 @@ public class SFEngine {
 	public static final boolean LOOP_BACKGROUND_MUSIC=true; //loop ano ne
 	public static final int BACKGROUND_LAYER_ONE = R.drawable.backgroundstars;
 	public static final float SCROLL_BACKGROUND_1 = .002f;
+	public static final int BACKGROUND_LAYER_TWO = R.drawable.debris;
+	public static final float SCROLL_BACKGROUND_2 = .007f;
+	public static final int GAME_THREAD_FPS_SLEEP = (1000/60); //60 snimku za 1 sec
+	
 	public static Context context; //aktuani kontext vlakna vnemz je prehravana hudba
 	public static Thread musicThread;
 

@@ -8,6 +8,8 @@ import android.opengl.GLSurfaceView.Renderer;
 public class SFGameRender implements Renderer {
 	private SFBackground background = new SFBackground();
 	private float bgScroll1; //uchovava pozici pozadi
+	private SFBackground background2 = new SFBackground();
+	private float bgScroll2; //uchovava pozici pozadi
 
 	private void scrollBackground1(GL10 gl){
 		if (bgScroll1 == Float.MAX_VALUE) //nesmi presahnout float max hodnutu
@@ -33,11 +35,45 @@ public class SFGameRender implements Renderer {
 		
 	}
 	
+	private void scrollBackground2(GL10 gl){
+		if (bgScroll2 == Float.MAX_VALUE) //nesmi presahnout float max hodnutu
+			bgScroll2 =0f;
+		
+		gl.glMatrixMode(GL10.GL_MODELVIEW);
+		gl.glLoadIdentity();
+		gl.glPushMatrix();
+		gl.glScalef(1f, 1f, 1f);
+		gl.glTranslatef(0f, 0f, 0f);
+		
+		gl.glMatrixMode(GL10.GL_TEXTURE);
+		gl.glLoadIdentity();
+		gl.glTranslatef(0.0f, bgScroll2, 0.0f);
+		background2.draw(gl);
+		gl.glPopMatrix();
+		bgScroll2+=SFEngine.SCROLL_BACKGROUND_2;
+		gl.glLoadIdentity();
+	}
+	
 	/*vykreslovaci jednotka kresli snimek*/
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		// TODO Auto-generated method stub
+		try{
+			Thread.sleep(SFEngine.GAME_THREAD_FPS_SLEEP); //vse se bude vykonavat max 60x za sec
+		}
+		catch(InterruptedException e){
+			e.printStackTrace();
+			
+		}
 		
+		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT); //vycistime mezipameti
+		scrollBackground1(gl);
+		scrollBackground2(gl);
+		
+		//zde se bude volat veskere dalsi vykreslovani
+		
+		gl.glEnable(GL10.GL_BLEND);//zobrazeni prhlednosti
+		gl.glBlendFunc(GL10.GL_ONE, GL10.GL_ONE); //zobrazeni prhlednosti
 	}
 
 	/*zmena velikosti okna, priprava obrazku pri zmene orientace nebo rozmeru okna*/
@@ -65,6 +101,7 @@ public class SFGameRender implements Renderer {
 		/*zacneme pridavat textury*/
 		
 		background.loadTexture(gl, SFEngine.BACKGROUND_LAYER_ONE, SFEngine.context);/*nahreajeme texturu pozadi*/
+		background2.loadTexture(gl, SFEngine.BACKGROUND_LAYER_TWO, SFEngine.context);/*nahreajeme texturu pozadi*/
 		
 	}
 
