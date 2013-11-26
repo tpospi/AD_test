@@ -14,7 +14,8 @@ public class SFEngine {
 	public static final int R_VOLUME=100; //hlasitost
 	public static final int L_VOLUME=100; //hlasitost
 	public static final boolean LOOP_BACKGROUND_MUSIC=true; //loop ano ne
-	
+	public static final int BACKGROUND_LAYER_ONE = R.drawable.backgroundstars;
+	public static final float SCROLL_BACKGROUND_1 = .002f;
 	public static Context context; //aktuani kontext vlakna vnemz je prehravana hudba
 	public static Thread musicThread;
 

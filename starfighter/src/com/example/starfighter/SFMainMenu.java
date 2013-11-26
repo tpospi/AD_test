@@ -39,6 +39,8 @@ public void onCreate(Bundle savedInstanceState){
 		@Override
 		public void onClick(View v){
 			/** spust hru*/
+			Intent game = new Intent(getApplicationContext(),SFGame.class);
+			SFMainMenu.this.startActivity(game);
 		}
 	});
 	
