@@ -12,6 +12,11 @@ public class SFGameRender implements Renderer {
 	private float bgScroll2; //uchovava pozici pozadi
 	private SFGoodGuy player1 = new SFGoodGuy(); //vytvoreni nove instance postavy
 	private int goodGuyBankFrames = 0; //promena na pocitani iteraci herniho cyklu od posledni zmeny pozice ve spritu postavy
+	
+	//nastaveni vypnuti prodlevy na polem zarizeni
+	private long loopStart =0;
+	private long loopEnd =0;
+	private long loopRunTime =0; //zjistime delku jednoho cyklu
 
 	/**
 	 * Ustredni metoda pro pohyb hrace
@@ -179,8 +184,12 @@ public class SFGameRender implements Renderer {
 	@Override
 	public void onDrawFrame(GL10 gl) {
 		// TODO Auto-generated method stub
+		loopStart = System.currentTimeMillis(); //zacatek cas
+				
 		try{
+			if (loopRunTime < SFEngine.GAME_THREAD_FPS_SLEEP){ //pokud je delka cyklu kratsi nez konstanta pak sleep
 			Thread.sleep(SFEngine.GAME_THREAD_FPS_SLEEP); //vse se bude vykonavat max 60x za sec
+			}
 		}
 		catch(InterruptedException e){
 			e.printStackTrace();
@@ -197,6 +206,9 @@ public class SFGameRender implements Renderer {
 
 		gl.glEnable(GL10.GL_BLEND);//zobrazeni prhlednosti
 		gl.glBlendFunc(GL10.GL_ONE, GL10.GL_ONE); //zobrazeni prhlednosti
+		
+		loopEnd = System.currentTimeMillis(); //konec cas
+		loopRunTime = (loopEnd - loopStart); //rozdil casu
 	}
 
 	/*zmena velikosti okna, priprava obrazku pri zmene orientace nebo rozmeru okna*/
