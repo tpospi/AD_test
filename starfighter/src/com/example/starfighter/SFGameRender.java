@@ -195,14 +195,15 @@ public class SFGameRender implements Renderer {
 			e.printStackTrace();
 
 		}
-
+		
+		//zde se bude volat veskere dalsi vykreslovani
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT); //vycistime mezipameti
 		scrollBackground1(gl); //pohyb pozadi
 		scrollBackground2(gl);//pohyb druheho pozadi
 		movePlayer1(gl); //pohyb postavy
 
 
-		//zde se bude volat veskere dalsi vykreslovani
+		
 
 		gl.glEnable(GL10.GL_BLEND);//zobrazeni prhlednosti
 		gl.glBlendFunc(GL10.GL_ONE, GL10.GL_ONE); //zobrazeni prhlednosti

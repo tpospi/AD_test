@@ -6,6 +6,7 @@ import android.view.Display;
 import android.view.View;
 
 
+
 public class SFEngine {
 /*konstanty*/
 	public static final int GAME_THREAD_DELAY=1000; //spozdeni uvodni obrazovky
@@ -34,7 +35,9 @@ public class SFEngine {
 	public static Display display;
 	public static int playerFlightAction = 0;
 	public static float playerBankPosX = 1.75f; //aktualni pozice lode
-	
+	public static int width = 0;
+	public static int height = 0;
+	public static int playableArea = 0;
 
 	/*uklid po ukonceni hry*/
 	public boolean onExit(View v){
@@ -51,4 +54,5 @@ public class SFEngine {
 			return false;
 		}
 	}
+	
 }
