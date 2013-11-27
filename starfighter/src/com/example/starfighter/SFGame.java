@@ -8,8 +8,8 @@ import android.view.MotionEvent;
 
 public class SFGame extends Activity {
 	private SFGameView gameView;
-	
-	
+
+
 	/**
 	 * Oprava pro starsi zarizeni. getSize/getWidth a getHeight
 	 * Vypocitana velikost dotykove plochy
@@ -20,29 +20,27 @@ public class SFGame extends Activity {
 
 
 
-	        Display disp = getWindowManager().getDefaultDisplay(); 
-	        SFEngine.width = disp.getWidth();
-	        SFEngine.height = disp.getHeight();
-	        System.out.println("Starej model");
+			Display disp = getWindowManager().getDefaultDisplay(); 
+			SFEngine.width = disp.getWidth();
+			SFEngine.height = disp.getHeight();
 
 
 
-	      } else {
-	  		//zjistime velikost obrazovky
-	  		Display disp = getWindowManager().getDefaultDisplay();
-	  		Point size = new Point();
-	  		disp.getSize(size);
-	  		SFEngine.width = size.x;
-	  		SFEngine.height = size.y;
-	  		System.out.println("Novej Model");
-	  	}
+		} else {
+			//zjistime velikost obrazovky
+			Display disp = getWindowManager().getDefaultDisplay();
+			Point size = new Point();
+			disp.getSize(size);
+			SFEngine.width = size.x;
+			SFEngine.height = size.y;
+		}
 		SFEngine.playableArea = (SFEngine.width/4) -SFEngine.height;
-	  }
+	}
 	@Override
 	public boolean onTouchEvent(MotionEvent event){ //standardni naslouchani
 		float x = event.getX(); //poloha dotyku na displaji
 		float y = event.getY(); //poloha dotyku na displaji
-		
+
 		if (y > SFEngine.playableArea){ //pokud jsem v hratelne zone
 			switch (event.getAction()){
 			case MotionEvent.ACTION_DOWN: //je treba porovnat na ktere strane obr. se hrac dotknul
@@ -51,22 +49,22 @@ public class SFGame extends Activity {
 				}else{
 					SFEngine.playerFlightAction = SFEngine.PLAYER_BANK_RIGHT_1;
 				}
-				
-			break;
-			
+
+				break;
+
 			case MotionEvent.ACTION_UP:
 				SFEngine.playerFlightAction = SFEngine.PLAYER_RELEASE;
-			break;
-			
+				break;
+
 			}
 		}
-		
+
 		return false;
 	}
-	
 
 
-	
+
+
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
@@ -74,15 +72,15 @@ public class SFGame extends Activity {
 		setContentView(gameView);
 		setDisplaySizes();
 	}
-	
-	
+
+
 	//obnova hry , napr z tel. hovoru
 	@Override
 	protected void onResume(){
 		super.onResume();
 		gameView.onResume();
 	}
-	
+
 	//pauza
 	@Override
 	protected void onPause(){
@@ -90,5 +88,5 @@ public class SFGame extends Activity {
 		gameView.onPause();
 	}
 
-	
+
 }

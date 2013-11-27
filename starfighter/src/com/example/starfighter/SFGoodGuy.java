@@ -1,15 +1,15 @@
 package com.example.starfighter;
-import java.io.InputStream;
+//import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
-
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.opengl.GLUtils;
+//
+//import android.content.Context;
+//import android.graphics.Bitmap;
+//import android.graphics.BitmapFactory;
+//import android.opengl.GLUtils;
 
 /**
  * Trida pilota
@@ -83,48 +83,50 @@ public class SFGoodGuy {
 		gl.glDisable(GL10.GL_CULL_FACE);
 	}
 	
-	public void loadTexture(GL10 gl, int texture, Context context){
-		InputStream imagestream = context.getResources().openRawResource(texture); //bereme ukazatel na texturu
-		Bitmap bitmap = null;
-		
-		try{
-			bitmap = BitmapFactory.decodeStream(imagestream); //nahrajeme do bitmapoveho proudu
-		}
-		catch(Exception e){
-		}
-		finally{
-			//vzdy vycistit a zavrit
-			try{
-				imagestream.close(); //stream uzavreme
-				imagestream = null;
-			}
-			catch(Exception e){
-			}
-		}
-	
-	/*generujeme ukazatel na texturu. 
-	 *textura je jen jedna a proto generujeme jen jeden nazev.
-	 *druhy arg je pro pole hodnot int pro kaydou texturu. mame jen jednu :)
-	 *treti je posun v poli. pole je od 0 proto zadny posun*/
-	//nasledujici dva radky opakujeme pro kazdou texturu
-	gl.glGenTextures(1, textures,0); 
-	gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);//vaze texturu k opengl
-	
-	//dva radky na mapovani texturu na vrcholy -
-	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
-			GL10.GL_NEAREST); //co elat pri zmenseni, nearest je rychle - nejbliysi sousede
-	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
-			GL10.GL_LINEAR); //co pro zvetseni - linearni interpolace, pomale pekne
-	
-	/*stale opakovani textury ve smeru s a t*/
-	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
-			GL10.GL_CLAMP_TO_EDGE);
-	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
-			GL10.GL_CLAMP_TO_EDGE);
-	
-	/*spojime bitmapovy proud s texturou, proud znicime*/	
-	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-	bitmap.recycle();
-	}
+//	
+//	public void loadTexture(GL10 gl, int texture, Context context){
+//		InputStream imagestream = context.getResources().openRawResource(texture); //bereme ukazatel na texturu
+//		Bitmap bitmap = null;
+//		
+//		try{
+//			bitmap = BitmapFactory.decodeStream(imagestream); //nahrajeme do bitmapoveho proudu
+//		}
+//		catch(Exception e){
+//		}
+//		finally{
+//			//vzdy vycistit a zavrit
+//			try{
+//				imagestream.close(); //stream uzavreme
+//				imagestream = null;
+//			}
+//			catch(Exception e){
+//			}
+//		}
+//	
+//	/*generujeme ukazatel na texturu. 
+//	 *textura je jen jedna a proto generujeme jen jeden nazev.
+//	 *druhy arg je pro pole hodnot int pro kaydou texturu. mame jen jednu :)
+//	 *treti je posun v poli. pole je od 0 proto zadny posun*/
+//	//nasledujici dva radky opakujeme pro kazdou texturu
+//	gl.glGenTextures(1, textures,0); 
+//	gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]);//vaze texturu k opengl
+//	
+//	//dva radky na mapovani texturu na vrcholy -
+//	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MIN_FILTER,
+//			GL10.GL_NEAREST); //co elat pri zmenseni, nearest je rychle - nejbliysi sousede
+//	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_MAG_FILTER,
+//			GL10.GL_LINEAR); //co pro zvetseni - linearni interpolace, pomale pekne
+//	
+//	/*stale opakovani textury ve smeru s a t*/
+//	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_S,
+//			GL10.GL_CLAMP_TO_EDGE);
+//	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T,
+//			GL10.GL_CLAMP_TO_EDGE);
+//	
+//	/*spojime bitmapovy proud s texturou, proud znicime*/	
+//	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
+//	bitmap.recycle();
+//	}
+//	
 	
 }
