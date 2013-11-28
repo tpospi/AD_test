@@ -5,9 +5,9 @@ import android.opengl.GLSurfaceView;
 
 public class SFGameView extends GLSurfaceView {
 	private SFGameRender renderer;
-	
-	public SFGameView(Context context){
-		super (context);
+
+	public SFGameView(Context context) {
+		super(context);
 		renderer = new SFGameRender();
 		this.setRenderer(renderer);
 	}

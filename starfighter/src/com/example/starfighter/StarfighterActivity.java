@@ -10,25 +10,25 @@ import android.view.WindowManager;
 public class StarfighterActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		SFEngine.display = ((WindowManager)
-				getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		SFEngine.display = ((WindowManager) getSystemService(Context.WINDOW_SERVICE))
+				.getDefaultDisplay();
 		super.onCreate(savedInstanceState);
 
-		/*zobraz uvodni obrazovku*/
+		/* zobraz uvodni obrazovku */
 		setContentView(R.layout.splashscreen);
-		
-		/*nove HERNI vlakno prez handler s prodlevou vytvoreni uvodniho menu*/
-		new Handler().postDelayed(new Thread(){
+
+		/* nove HERNI vlakno prez handler s prodlevou vytvoreni uvodniho menu */
+		new Handler().postDelayed(new Thread() {
 			@Override
-			public void run(){
-				/*intent - operace kterou ma android udelat*/
-				Intent mainMenu =
-						new Intent(StarfighterActivity.this, SFMainMenu.class);
+			public void run() {
+				/* intent - operace kterou ma android udelat */
+				Intent mainMenu = new Intent(StarfighterActivity.this,
+						SFMainMenu.class);
 				StarfighterActivity.this.startActivity(mainMenu);
 				StarfighterActivity.this.finish();
-				/*prolnuti uvodni obr a menu*/
-				overridePendingTransition(R.layout.fadein,R.layout.fadeout);
+				/* prolnuti uvodni obr a menu */
+				overridePendingTransition(R.layout.fadein, R.layout.fadeout);
 			}
 		}, SFEngine.GAME_THREAD_DELAY);
-}
+	}
 }
