@@ -50,6 +50,15 @@ public class SFEngine {
 	public static final float BEZIER_Y_2 = 2.4f;
 	public static final float BEZIER_Y_3 = 1.5f;
 	public static final float BEZIER_Y_4 = 2.6f;
+	public static final int WEAPON_SHEET = R.drawable.destruction;
+	public static final int PLAYER_SHIELD = 5;
+	public static final int SCOUT_SHIELDS = 3;
+	public static final int INTERCEPTOR_SHIELDS = 1;
+	public static final int WARSHIP_SHIELDS = 5;
+	public static final float PLAYER_BULLET_SPEED = 0.125f;
+	
+	
+	
 
 	public static int CHARACTER_SHEET = R.drawable.character_sprite;
 	public static int TOTAL_INTERCEPTORS = 10;
