@@ -15,15 +15,14 @@ public class SFEngine {
 																// tlacitek
 	public static final int SPLASH_SCREEN_MUSIC = R.raw.warfieldedit; // muzika
 																		// menu
-	public static final int R_VOLUME = 100; // hlasitost
-	public static final int L_VOLUME = 100; // hlasitost
+	public static final int R_VOLUME = 0; // hlasitost
+	public static final int L_VOLUME = 0; // hlasitost
 	public static final boolean LOOP_BACKGROUND_MUSIC = true; // loop ano ne
 	public static final int BACKGROUND_LAYER_ONE = R.drawable.backgroundstars; // textura
 	public static final float SCROLL_BACKGROUND_1 = .002f;
 	public static final int BACKGROUND_LAYER_TWO = R.drawable.debris;
 	public static final float SCROLL_BACKGROUND_2 = .007f;
-	public static final int GAME_THREAD_FPS_SLEEP = (1000 / 60); // 60 snimku za
-																	// 1 sec
+	public static final int GAME_THREAD_FPS_SLEEP = (1000 / 60); // 60 snimku za 1 sec
 	// public static final int PLAYER_SHIP = R.drawable.good_sprite;//textura
 	// lodi
 	public static final int PLAYER_BANK_LEFT_1 = 1; // akce kterou player

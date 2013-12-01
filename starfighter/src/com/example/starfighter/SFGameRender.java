@@ -1,5 +1,7 @@
 package com.example.starfighter;
 
+import java.util.Random;
+
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
@@ -7,25 +9,24 @@ import android.opengl.GLSurfaceView.Renderer;
 
 public class SFGameRender implements Renderer {
 	private SFBackground background = new SFBackground();
-	private float bgScroll1; // uchovava pozici pozadi
 	private SFBackground background2 = new SFBackground();
-	private float bgScroll2; // uchovava pozici pozadi
-	private SFGoodGuy player1 = new SFGoodGuy(); // vytvoreni nove instance
-													// postavy
-	private int goodGuyBankFrames = 0; // promena na pocitani iteraci herniho
-										// cyklu od posledni zmeny pozice ve
-										// spritu postavy
-	
+	private SFGoodGuy player1 = new SFGoodGuy(); // vytvoreni nove instance postavy
+
+
 	private SFEnemy[] enemies =
-			new SFEnemy[SFEngine.TOTAL_INTERCEPTORS+SFEngine.TOTAL_SCOUTS+SFEngine.TOTAL_WARSHIPS-1]; //-1 pro 0 v kazdem poli
+			new SFEnemy[SFEngine.TOTAL_INTERCEPTORS+SFEngine.TOTAL_SCOUTS+SFEngine.TOTAL_WARSHIPS];
 	private SFTextures textureLoader;
 	private int[] spriteSheets = new int [2];
+
+	private float bgScroll1; // uchovava pozici pozadi
+	private float bgScroll2; // uchovava pozici pozadi
+	private int goodGuyBankFrames = 0; // promena na pocitani iteraci herniho cyklu od posledni zmeny pozice ve spritu postavy
 
 	// nastaveni vypnuti prodlevy na polem zarizeni
 	private long loopStart = 0;
 	private long loopEnd = 0;
 	private long loopRunTime = 0; // zjistime delku jednoho cyklu
-	
+
 	/**
 	 * metoda pro interceptory
 	 * */
@@ -35,33 +36,175 @@ public class SFGameRender implements Renderer {
 			enemies[x]=interceptor;
 		}
 	}
-	
-	/**
+
+	/** --rozdil
 	 * metoda pro Scouty
 	 * */
 	private void initializeScouts(){
 		for(int x = 0; x<SFEngine.TOTAL_SCOUTS; x++){
+			SFEnemy scout;
 			if(x>=SFEngine.TOTAL_SCOUTS/2){
-			SFEnemy scout = new SFEnemy(SFEngine.TYPE_SCOUT, SFEngine.ATTACK_LEFT);
-			enemies[x]=scout;
+				scout = new SFEnemy(SFEngine.TYPE_SCOUT, SFEngine.ATTACK_LEFT);
+
 			}
 			else{
-				
+				scout = new SFEnemy(SFEngine.TYPE_SCOUT, SFEngine.ATTACK_RANDOM);	
 			}
-			SFEnemy scout = new SFEnemy(SFEngine.TYPE_SCOUT, SFEngine.ATTACK_RANDOM);
-			enemies[x]=scout;
+
+			enemies[x+SFEngine.TOTAL_INTERCEPTORS]=scout;
 		}
 	}
-	
+
 	/**
 	 * metoda pro Warships
 	 * */
 	private void initializeWarships(){
 		for(int x = 0; x<SFEngine.TOTAL_WARSHIPS; x++){
 			SFEnemy warship = new SFEnemy(SFEngine.TYPE_WARSHIP, SFEngine.ATTACK_RIGHT);
-			enemies[x]=warship;
+			enemies[x+SFEngine.TOTAL_INTERCEPTORS+SFEngine.TOTAL_SCOUTS]=warship;
 		}
 	}
+
+	private void moveEnemy(GL10 gl){
+		for (int x = 0; x < SFEngine.TOTAL_INTERCEPTORS + SFEngine.TOTAL_SCOUTS + SFEngine.TOTAL_WARSHIPS; x++){
+			if(!enemies[x].isDestroyed){ //jestlize neni jeste znicen tak...
+				Random randomPos = new Random();
+
+				switch (enemies[x].enemyType){
+				case SFEngine.TYPE_INTERCEPTOR:
+					if (enemies[x].posY <=-1){
+						enemies[x].posY = randomPos.nextFloat() * 4 + 4;
+						enemies[x].posX = randomPos.nextFloat() * 3;
+						enemies[x].isLockedOn = false;
+						enemies[x].lockOnPosX = 0;
+					}
+					gl.glMatrixMode(GL10.GL_MODELVIEW);
+					gl.glLoadIdentity();
+					gl.glPushMatrix();
+					gl.glScalef(0.25f, 0.25f, 1);
+					//nez se nepritel zameri na hrace
+					if (enemies[x].posY >= 3){
+						enemies[x].posY -= SFEngine.INTERCEPTOR_SPEED; //jede primo domu konstantni rychlosti
+					}
+					else{
+						if(!enemies[x].isLockedOn){
+							enemies[x].lockOnPosX = SFEngine.playerBankPosX; //Nepritel se zameri na hrace a zalokuje si pozici
+							enemies[x].isLockedOn = true;
+							enemies[x].incrementXToTarget = 
+									(float)((enemies[x].lockOnPosX - enemies[x].posX)/(enemies[x].posY / (SFEngine.INTERCEPTOR_SPEED *4))); //vzorec pro zjisteni posunu k hraci
+						}
+						//posun
+						enemies[x].posY -=(SFEngine.INTERCEPTOR_SPEED *4);
+						enemies[x].posX +=enemies[x].incrementXToTarget;
+						
+
+						//aktualizace openGL
+						gl.glTranslatef(enemies[x].posX, enemies[x].posY, 0f);
+						gl.glMatrixMode(GL10.GL_TEXTURE);
+						gl.glLoadIdentity();
+						gl.glTranslatef(0.25f, 0.25f, 0.0f);
+
+					}
+
+					enemies[x].draw(gl, spriteSheets);
+					gl.glPopMatrix();
+					gl.glLoadIdentity();
+
+					break;
+
+				case SFEngine.TYPE_SCOUT:
+					if (enemies[x].posY <= -1){
+						enemies[x].posY = randomPos.nextFloat() * 4 + 4;
+						//enemies[x].posX = randomPos.nextFloat() * 3;
+						enemies[x].isLockedOn = false;
+						enemies[x].posT = SFEngine.SCOUT_SPEED;
+						enemies[x].lockOnPosX = enemies[x].getNextScoutX();
+						enemies[x].lockOnPosX = enemies[x].getNextScoutY();
+
+						if (enemies[x].attackDirection==SFEngine.ATTACK_LEFT){
+							enemies[x].posX=0;
+						}
+						else{
+							enemies[x].posX=3;
+						}
+					}
+					gl.glMatrixMode(GL10.GL_MODELVIEW);
+					gl.glLoadIdentity();
+					gl.glPushMatrix();
+					gl.glScalef(0.25f, 0.25f, 1);
+
+					//nahodny pohyb pruzkumnika
+					if(enemies[x].posY>=2.75f){
+						enemies[x].posY -=SFEngine.SCOUT_SPEED;
+
+					}
+					else{
+						enemies[x].posX = enemies[x].getNextScoutX();
+						enemies[x].posY = enemies[x].getNextScoutY();
+						enemies[x].posT +=SFEngine.SCOUT_SPEED;
+
+
+					}
+
+					//aktualizace openGL
+					gl.glTranslatef(enemies[x].posX, enemies[x].posY, 0f);
+					gl.glMatrixMode(GL10.GL_TEXTURE);
+					gl.glLoadIdentity();
+					gl.glTranslatef(0.75f, 0.25f, 0.0f);
+
+					enemies[x].draw(gl, spriteSheets);
+
+					gl.glPopMatrix();
+					gl.glLoadIdentity();
+
+					break;
+
+				case SFEngine.TYPE_WARSHIP:
+					if (enemies[x].posY < -1){
+						enemies[x].posY = randomPos.nextFloat() * 4 + 4;
+						enemies[x].posX = randomPos.nextFloat() * 3;
+						enemies[x].isLockedOn = false;
+						enemies[x].lockOnPosX = 0;
+					}
+					gl.glMatrixMode(GL10.GL_MODELVIEW);
+					gl.glLoadIdentity();
+					gl.glPushMatrix();
+					gl.glScalef(0.25f, 0.25f, 1);
+					//nez se nepritel zameri na hrace
+					if (enemies[x].posY>=3){
+						enemies[x].posY -= SFEngine.WARSHIP_SPEED; //jede primo domu konstantni rychlosti
+					}
+					else{
+						if(!enemies[x].isLockedOn){
+							enemies[x].lockOnPosX = randomPos.nextFloat()*3; //Nepritel se zameri na nahodnou poz
+							enemies[x].isLockedOn = true;
+							enemies[x].incrementXToTarget = 
+									(float)((enemies[x].lockOnPosX - enemies[x].posX)/(enemies[x].posY / (SFEngine.WARSHIP_SPEED *4))); //vzorec pro zjisteni posunu k hraci
+						}
+						//posun
+						enemies[x].posX +=enemies[x].incrementXToTarget;
+						enemies[x].posY -=(SFEngine.WARSHIP_SPEED *2);
+					}
+					//aktualizace openGL
+					gl.glTranslatef(enemies[x].posX, enemies[x].posY, 0f);
+					gl.glMatrixMode(GL10.GL_TEXTURE);
+					gl.glLoadIdentity();
+					gl.glTranslatef(0.50f, 0.25f, 0.0f);
+
+
+
+					enemies[x].draw(gl, spriteSheets);
+					gl.glPopMatrix();
+					gl.glLoadIdentity();
+					break;
+
+				}
+			}
+
+		}
+	}
+
+
 
 	/**
 	 * Ustredni metoda pro pohyb hrace
@@ -77,10 +220,7 @@ public class SFGameRender implements Renderer {
 			gl.glScalef(0.25f, 0.25f, 1f);
 			// pohyb
 			if (SFEngine.playerBankPosX > 0
-					&& goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // testovani
-																					// kde
-																					// je
-																					// hrac
+					&& goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // testovani kde je hrac
 				SFEngine.playerBankPosX -= SFEngine.PLAYER_BANK_SPEED;
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
 
@@ -89,27 +229,16 @@ public class SFGameRender implements Renderer {
 				gl.glLoadIdentity();
 				gl.glTranslatef(0.25f, 0.0f, 0.0f); // sprite poloha na texture
 				goodGuyBankFrames += 1; // inkrementace pro zjisteni na to kdy
-										// prejit na dalsi sprit
+				// prejit na dalsi sprit
 			} else if (SFEngine.playerBankPosX > 0
-					&& goodGuyBankFrames >= SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // pokud
-																					// neni
-																					// na
-																					// kraji
-																					// ale
-																					// uplynulo
-																					// 9
-																					// snimku
-																					// -
-																					// naklon
-																					// cislo
-																					// 2
+					&& goodGuyBankFrames >= SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // pokud neni na kraji ale uplynulo 9 snimku - naklon cislo 2
 				SFEngine.playerBankPosX -= SFEngine.PLAYER_BANK_SPEED;
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
 				// rezim posunuti textury na spravny sprite
 				gl.glMatrixMode(GL10.GL_TEXTURE);
 				gl.glLoadIdentity();
 				gl.glTranslatef(0.50f, 0.0f, 0.0f); // sprite poloha left 2 na
-													// texture
+				// texture
 
 			} else { // hrac je na levem kraji obrazovky
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
@@ -120,7 +249,7 @@ public class SFGameRender implements Renderer {
 
 			}
 
-			player1.draw(gl);
+			player1.draw(gl, spriteSheets);
 			gl.glPopMatrix();
 			gl.glLoadIdentity();
 
@@ -135,9 +264,9 @@ public class SFGameRender implements Renderer {
 			// pohyb
 			if (SFEngine.playerBankPosX < 3
 					&& goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // testovani
-																					// kde
-																					// je
-																					// hrac
+				// kde
+				// je
+				// hrac
 				SFEngine.playerBankPosX += SFEngine.PLAYER_BANK_SPEED;
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
 
@@ -147,29 +276,18 @@ public class SFGameRender implements Renderer {
 				gl.glTranslatef(0.75f, 0.0f, 0.0f); // sprite poloha na texture
 
 				goodGuyBankFrames += 1; // inkrementace pro zjisteni na to kdy
-										// prejit na dalsi sprit
+				// prejit na dalsi sprit
 			} else if (SFEngine.playerBankPosX < 3
-					&& goodGuyBankFrames >= SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // pokud
-																					// neni
-																					// na
-																					// kraji
-																					// ale
-																					// uplynulo
-																					// 9
-																					// snimku
-																					// -
-																					// naklon
-																					// cislo
-																					// 2
+					&& goodGuyBankFrames >= SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // pokud neni na kraji ale uplynulo 9 snimku - naklon cislo 2
 				SFEngine.playerBankPosX += SFEngine.PLAYER_BANK_SPEED;
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
 				// rezim posunuti textury na spravny sprite
 				gl.glMatrixMode(GL10.GL_TEXTURE);
 				gl.glLoadIdentity();
 				gl.glTranslatef(0.0f, 0.25f, 0.0f); // sprite poloha left 2 na
-													// texture
+				// texture
 
-			} else { // hrac je na levem kraji obrazovky
+			} else { // hrac je na pravem kraji obrazovky
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
 				// rezim posunuti textury na spravny sprite
 				gl.glMatrixMode(GL10.GL_TEXTURE);
@@ -177,27 +295,27 @@ public class SFGameRender implements Renderer {
 				gl.glTranslatef(0.0f, 0.0f, 0.0f); // sprite poloha na texture
 			}
 
-			player1.draw(gl);
+			player1.draw(gl, spriteSheets);
 			gl.glPopMatrix();
 			gl.glLoadIdentity();
 			break;
 
 		case SFEngine.PLAYER_RELEASE: // zatim se deje to same jako by hrac nic
-										// nedelal. proste po uvolneni tlacitka
-										// se zobrazi prvni sprit
+			// nedelal. proste po uvolneni tlacitka
+			// se zobrazi prvni sprit
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glPushMatrix();
 			gl.glScalef(0.25f, 0.25f, 1f); // scale hrace na 25procent
 			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f); // pozice
-																// aktualni.
-																// nedochazi k
-																// pohybu
+			// aktualni.
+			// nedochazi k
+			// pohybu
 			gl.glMatrixMode(GL10.GL_TEXTURE);
 			gl.glLoadIdentity();
 			gl.glTranslatef(0f, 0f, 0f);
 
-			player1.draw(gl);
+			player1.draw(gl, spriteSheets);
 			gl.glPopMatrix();
 			gl.glLoadIdentity();
 			goodGuyBankFrames += 1; // pocitame snimky od uvolneni
@@ -209,14 +327,14 @@ public class SFGameRender implements Renderer {
 			gl.glPushMatrix();
 			gl.glScalef(0.25f, 0.25f, 1f); // scale hrace na 25procent
 			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f); // pozice
-																// aktualni.
-																// nedochazi k
-																// pohybu
+			// aktualni.
+			// nedochazi k
+			// pohybu
 			gl.glMatrixMode(GL10.GL_TEXTURE);
 			gl.glLoadIdentity();
 			gl.glTranslatef(0f, 0f, 0f);
 
-			player1.draw(gl);
+			player1.draw(gl,spriteSheets);
 			gl.glPopMatrix();
 			gl.glLoadIdentity();
 			break;
@@ -236,7 +354,7 @@ public class SFGameRender implements Renderer {
 		gl.glMatrixMode(GL10.GL_TEXTURE); // nastaveni matice na texturovaci
 		gl.glLoadIdentity(); // resetovani model matice do defaultu
 		gl.glTranslatef(0.0f, bgScroll1, 0.0f); // posun pozadi o konstantu ve
-												// smetu y
+		// smetu y
 
 		background.draw(gl);
 		gl.glPopMatrix(); // vyzvedneme si uloyenou matici
@@ -272,13 +390,13 @@ public class SFGameRender implements Renderer {
 
 		try {
 			if (loopRunTime < SFEngine.GAME_THREAD_FPS_SLEEP) { // pokud je
-																// delka cyklu
-																// kratsi nez
-																// konstanta pak
-																// sleep
-				Thread.sleep(SFEngine.GAME_THREAD_FPS_SLEEP); // vse se bude
-																// vykonavat max
-																// 60x za sec
+				// delka cyklu
+				// kratsi nez
+				// konstanta pak
+				// sleep
+				Thread.sleep(SFEngine.GAME_THREAD_FPS_SLEEP - loopRunTime); // vse se bude
+				// vykonavat max
+				// 60x za sec
 			}
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -287,10 +405,11 @@ public class SFGameRender implements Renderer {
 
 		// zde se bude volat veskere dalsi vykreslovani
 		gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT); // vycistime
-																			// mezipameti
+		// mezipameti
 		scrollBackground1(gl); // pohyb pozadi
 		scrollBackground2(gl);// pohyb druheho pozadi
 		movePlayer1(gl); // pohyb postavy
+		moveEnemy(gl);
 
 		gl.glEnable(GL10.GL_BLEND);// zobrazeni prhlednosti
 		gl.glBlendFunc(GL10.GL_ONE, GL10.GL_ONE); // zobrazeni prhlednosti
@@ -310,7 +429,7 @@ public class SFGameRender implements Renderer {
 		gl.glMatrixMode(GL10.GL_PROJECTION); // projekcni matice
 		gl.glLoadIdentity(); // nastaveni do defaultu
 		gl.glOrthof(0f, 1f, 0f, 1f, -1f, 1f); // dvourozmerne vykresleni sceny -
-												// parametry orezove roviny
+		// parametry orezove roviny
 
 	}
 
@@ -320,16 +439,16 @@ public class SFGameRender implements Renderer {
 		initializeInterceptors();
 		initializeScouts();
 		initializeWarships();
-		
+
 		//textury - arch spritu
 		textureLoader = new SFTextures(gl);
 		spriteSheets = textureLoader.loadTexture(gl, SFEngine.CHARACTER_SHEET, SFEngine.context,1);
-		
-		
-		
+
+
+
 		// TODO Auto-generated method stub
 		gl.glEnable(GL10.GL_TEXTURE_2D); // aktivace openGL pro mapovani 2d
-											// textur
+		// textur
 		gl.glClearDepthf(1.0f); // poradi predmetu
 		gl.glEnable(GL10.GL_DEPTH_TEST);
 		gl.glDepthFunc(GL10.GL_LEQUAL);
@@ -342,11 +461,7 @@ public class SFGameRender implements Renderer {
 				SFEngine.context);/* nahreajeme texturu pozadi */
 		background2.loadTexture(gl, SFEngine.BACKGROUND_LAYER_TWO,
 				SFEngine.context);/* nahreajeme texturu pozadi */
-		//player1.loadTexture(gl, SFEngine.PLAYER_SHIP, SFEngine.context);/*
-																		 * nahreajeme
-																		 * texturu
-																		 * pozadi
-																		 */
+		//player1.loadTexture(gl, SFEngine.PLAYER_SHIP, SFEngine.context);/** nahreajeme texturu pozadi*/
 
 	}
 

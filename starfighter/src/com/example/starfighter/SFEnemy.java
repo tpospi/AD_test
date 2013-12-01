@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Random;
-
 import javax.microedition.khronos.opengles.GL10;
 
 public class SFEnemy {
@@ -20,7 +19,7 @@ public class SFEnemy {
 	public boolean isDestroyed = false; // lod znicena?
 	public int enemyType = 0; // ktery typ lode
 
-	public boolean isLocketOn = false; // zameril se nepritel na cil?
+	public boolean isLockedOn = false; // zameril se nepritel na cil?
 	public float lockOnPosX = 0f; // x pozice cile
 	public float lockOnPosY = 0f; // y pozice cile
 
@@ -30,16 +29,25 @@ public class SFEnemy {
 	private FloatBuffer textureBuffer;
 	private ByteBuffer indexBuffer;
 
-	private float vertices[] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f, 0.0f, };
+	private float vertices[] = {
+			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, };
 
-	private float texture[] = { 0.0f, 0.0f, 0.25f, 0.0f, 0.25f, 0.25f, 0.0f,
-			0.25f,
+	private float texture[] = { 
+			0.0f, 0.0f,
+			0.25f, 0.0f,
+			0.25f, 0.25f,
+			0.0f, 0.25f,
 
 	};
 	// rohy spritu textury
 
-	private byte indices[] = { 0, 1, 2, 0, 2, 3, };
+	private byte indices[] = { 
+			0, 1, 2,
+			0, 2, 3,
+	};
 
 	/**
 	 * Konstruktor
@@ -71,12 +79,7 @@ public class SFEnemy {
 
 		posT = SFEngine.SCOUT_SPEED;
 
-		ByteBuffer byteBuf = ByteBuffer.allocateDirect(vertices.length * 4);// nasobime
-																			// 4
-																			// protoze
-																			// folat
-																			// =
-																			// byte*4
+		ByteBuffer byteBuf = ByteBuffer.allocateDirect(vertices.length * 4);// nasobime 4 protoze folat = byte*4
 		byteBuf.order(ByteOrder.nativeOrder());
 		vertexBuffer = byteBuf.asFloatBuffer();
 		vertexBuffer.put(vertices);
@@ -103,26 +106,24 @@ public class SFEnemy {
 
 	public float getNextScoutX() {
 		if (attackDirection == SFEngine.ATTACK_LEFT) {
-			return (float) ((SFEngine.BEZIER_X_4 * (Math.pow(posT, 3)))
-					+ (SFEngine.BEZIER_X_3 * 3 * (Math.pow(posT, 2)))
-					+ (SFEngine.BEZIER_X_2 * 3 * posT * (Math
-							.pow((1 - posT), 2))) + (SFEngine.BEZIER_X_1 * (Math
-					.pow((1 - posT), 3))));
+			return (float)((SFEngine.BEZIER_X_4*(posT*posT*posT)) + 
+	                (SFEngine.BEZIER_X_3 * 3 * (posT * posT) * (1-posT)) +     
+	                (SFEngine.BEZIER_X_2 * 3 * posT * ((1-posT) * (1-posT))) +     
+	                (SFEngine.BEZIER_X_1 * ((1-posT) * (1-posT) * (1-posT))));
 		} else {
 
-			return (float) ((SFEngine.BEZIER_X_1 * (Math.pow(posT, 3)))
-					+ (SFEngine.BEZIER_X_2 * 3 * (Math.pow(posT, 2)))
-					+ (SFEngine.BEZIER_X_3 * 3 * posT * (Math
-							.pow((1 - posT), 2))) + (SFEngine.BEZIER_X_4 * (Math
-					.pow((1 - posT), 3))));
+			return (float)((SFEngine.BEZIER_X_1*(posT*posT*posT)) + 
+	                (SFEngine.BEZIER_X_2 * 3 * (posT * posT) * (1-posT)) +     
+	                (SFEngine.BEZIER_X_3 * 3 * posT * ((1-posT) * (1-posT))) + 
+	                (SFEngine.BEZIER_X_4 * ((1-posT) * (1-posT) * (1-posT)))); 
 		}
 	}
 
 	public float getNextScoutY() {
-		return (float) ((SFEngine.BEZIER_Y_1 * (Math.pow(posT, 3)))
-				+ (SFEngine.BEZIER_Y_2 * 3 * (Math.pow(posT, 2)))
-				+ (SFEngine.BEZIER_Y_3 * 3 * posT * (Math.pow((1 - posT), 2))) + (SFEngine.BEZIER_Y_4 * (Math
-				.pow((1 - posT), 3))));
+		return (float)((SFEngine.BEZIER_Y_1*(posT*posT*posT)) + 
+	            (SFEngine.BEZIER_Y_2 * 3 * (posT * posT) * (1-posT)) +     
+	            (SFEngine.BEZIER_Y_3 * 3 * posT * ((1-posT) * (1-posT))) + 
+	            (SFEngine.BEZIER_Y_4 * ((1-posT) * (1-posT) * (1-posT)))); 
 
 	}
 

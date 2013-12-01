@@ -32,12 +32,15 @@ public int[] loadTexture(GL10 gl, int texture, Context context, int textureNumbe
 	catch(Exception e){
 		
 	}
+	
+	finally{
 	try {
 		imagestream.close();
 		imagestream = null;
 	}
 	catch(IOException e){
 		
+	}
 	}
 	
 	gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[textureNumber -1]);
@@ -47,7 +50,8 @@ public int[] loadTexture(GL10 gl, int texture, Context context, int textureNumbe
 	gl.glTexParameterf(GL10.GL_TEXTURE_2D, GL10.GL_TEXTURE_WRAP_T, GL10.GL_CLAMP_TO_EDGE);
 	
 	GLUtils.texImage2D(GL10.GL_TEXTURE_2D, 0, bitmap, 0);
-	
+	bitmap.recycle();
 	return textures;
 	
+}
 }

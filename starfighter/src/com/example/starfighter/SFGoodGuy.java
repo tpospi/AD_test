@@ -19,18 +19,26 @@ public class SFGoodGuy {
 	private FloatBuffer vertexBuffer;
 	private FloatBuffer textureBuffer;
 	private ByteBuffer indexBuffer;
-	private int[] textures = new int[1];
+	//private int[] textures = new int[1];
 
-	private float vertices[] = { 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
-			1.0f, 0.0f, 0.0f, 1.0f, 0.0f, };
+	private float vertices[] = { 
+			0.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 0.0f,
+			1.0f, 1.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, };
 
-	private float texture[] = { 0.0f, 0.0f, 0.25f, 0.0f, 0.25f, 0.25f, 0.0f,
-			0.25f,
+	private float texture[] = {
+			0.0f, 0.0f,
+			0.25f, 0.0f,
+			0.25f, 0.25f,
+			0.0f, 0.25f,
 
 	};
 	// rohy spritu textury
 
-	private byte indices[] = { 0, 1, 2, 0, 2, 3, };
+	private byte indices[] = { 
+			0, 1, 2,
+			0, 2, 3, };
 
 	public SFGoodGuy() {
 		ByteBuffer byteBuf = ByteBuffer.allocateDirect(vertices.length * 4);// nasobime
@@ -63,8 +71,8 @@ public class SFGoodGuy {
 		indexBuffer.position(0); // nastavime pozici na 0
 	}
 
-	public void draw(GL10 gl) {
-		gl.glBindTexture(GL10.GL_TEXTURE_2D, textures[0]); // svaze texturu s
+	public void draw(GL10 gl, int[] spriteSheet) {
+		gl.glBindTexture(GL10.GL_TEXTURE_2D, spriteSheet[0]); // svaze texturu s
 															// cilem-nahraje a
 															// je pripravena
 
