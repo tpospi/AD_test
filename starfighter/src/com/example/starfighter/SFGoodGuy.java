@@ -16,6 +16,7 @@ import javax.microedition.khronos.opengles.GL10;
  * Trida pilota
  * */
 public class SFGoodGuy {
+	public boolean isDestroyed = false;
 	private FloatBuffer vertexBuffer;
 	private FloatBuffer textureBuffer;
 	private ByteBuffer indexBuffer;

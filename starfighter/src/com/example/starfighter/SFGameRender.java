@@ -17,6 +17,7 @@ public class SFGameRender implements Renderer {
 			new SFEnemy[SFEngine.TOTAL_INTERCEPTORS+SFEngine.TOTAL_SCOUTS+SFEngine.TOTAL_WARSHIPS];
 	private SFTextures textureLoader;
 	private int[] spriteSheets = new int [2];
+	private SFWeapon[] playerFire = new SFWeapon[4];
 
 	private float bgScroll1; // uchovava pozici pozadi
 	private float bgScroll2; // uchovava pozici pozadi
@@ -65,6 +66,70 @@ public class SFGameRender implements Renderer {
 		}
 	}
 
+	/**
+	 * metoda pro Wzbrane
+	 * */
+	private void initializePlayerWeapons(){
+		for(int x = 0; x < 4; x++){
+			SFWeapon weapon = new SFWeapon();
+			playerFire[x] = weapon;
+		}
+		//prvni strela
+		playerFire[0].shotFired = true;
+		playerFire[0].posX = SFEngine.playerBankPosX;
+		playerFire[0].posY = 1.25f;
+	}
+	
+	private void firePlayerWeapon(GL10 gl){
+		for (int x = 0; x < 4; x++){
+			if (playerFire[x].shotFired){
+				int nextShot=0; //uchovava strelu ready pro vystreleni
+				if (playerFire[x].posY>4.75){
+					playerFire[x].shotFired = false;
+					
+				}
+				else
+				{
+					//je treba vystrelit dalsi strelu?
+					if (playerFire[x].posY>2){
+						if (x==3){
+							nextShot = 0;
+						}
+						else{
+							nextShot = x+1;
+						}
+					}
+					
+					if (playerFire[nextShot].shotFired ==false){
+						playerFire[nextShot].shotFired = true;
+						playerFire[nextShot].posX = SFEngine.playerBankPosX;
+						playerFire[nextShot].posY = 1.25f;
+					}
+				//kreslime strelu
+					playerFire[x].posY += SFEngine.PLAYER_BULLET_SPEED; //inkrementace strel
+					
+					gl.glMatrixMode(GL10.GL_MODELVIEW);
+					gl.glLoadIdentity();
+					gl.glPushMatrix();
+					gl.glScalef(0.25f, 0.25f, 0.25f);
+					gl.glTranslatef(playerFire[x].posX, playerFire[x].posY, 0f);
+					
+					gl.glMatrixMode(GL10.GL_TEXTURE);
+					gl.glLoadIdentity();
+					gl.glTranslatef(0f, 0f, 0f); //prvni sprit
+					playerFire[x].draw(gl, spriteSheets);
+					
+					gl.glPopMatrix();
+					gl.glLoadIdentity();
+					
+					
+					
+				}
+			}
+		}
+	}
+
+	
 	private void moveEnemy(GL10 gl){
 		for (int x = 0; x < SFEngine.TOTAL_INTERCEPTORS + SFEngine.TOTAL_SCOUTS + SFEngine.TOTAL_WARSHIPS; x++){
 			if(!enemies[x].isDestroyed){ //jestlize neni jeste znicen tak...
@@ -210,6 +275,8 @@ public class SFGameRender implements Renderer {
 	 * Ustredni metoda pro pohyb hrace
 	 * */
 	private void movePlayer1(GL10 gl) {
+		
+		if(!player1.isDestroyed){
 		switch (SFEngine.playerFlightAction) {
 
 		case SFEngine.PLAYER_BANK_LEFT_1:
@@ -339,6 +406,10 @@ public class SFGameRender implements Renderer {
 			gl.glLoadIdentity();
 			break;
 		}
+		firePlayerWeapon(gl); //dame to sem protoze hrac muze byt treba mrtev
+		}
+		
+		
 	}
 
 	private void scrollBackground1(GL10 gl) {
@@ -439,10 +510,12 @@ public class SFGameRender implements Renderer {
 		initializeInterceptors();
 		initializeScouts();
 		initializeWarships();
+		initializePlayerWeapons();
 
 		//textury - arch spritu
 		textureLoader = new SFTextures(gl);
-		spriteSheets = textureLoader.loadTexture(gl, SFEngine.CHARACTER_SHEET, SFEngine.context,1);
+		spriteSheets = textureLoader.loadTexture(gl, SFEngine.CHARACTER_SHEET, SFEngine.context,1); //hrac a potvory
+		spriteSheets = textureLoader.loadTexture(gl, SFEngine.WEAPON_SHEET, SFEngine.context,2); //zbrane
 
 
 
