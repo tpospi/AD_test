@@ -24,6 +24,10 @@ public class SFEnemy {
 	public float lockOnPosY = 0f; // y pozice cile
 
 	private Random randomPos = new Random();
+	private int damage = 0;
+	
+	
+	
 	/* OPENG GL */
 	private FloatBuffer vertexBuffer;
 	private FloatBuffer textureBuffer;
@@ -103,6 +107,34 @@ public class SFEnemy {
 		indexBuffer.put(indices); // vlozime indexy
 		indexBuffer.position(0); // nastavime pozici na 0
 	}
+	
+	public void applyDamage(){
+		damage++;
+		
+		switch (enemyType){
+		case SFEngine.TYPE_INTERCEPTOR:
+			
+			if (damage == SFEngine.INTERCEPTOR_SHIELDS){
+				isDestroyed =true;
+			}
+			break;
+			
+		case SFEngine.TYPE_SCOUT:
+			if (damage == SFEngine.SCOUT_SHIELDS){
+				isDestroyed =true;
+			}
+			break;
+			
+		case SFEngine.TYPE_WARSHIP:
+			if (damage == SFEngine.WARSHIP_SHIELDS){
+				isDestroyed =true;
+			}
+			break;
+			
+		}
+	}
+	
+	
 
 	public float getNextScoutX() {
 		if (attackDirection == SFEngine.ATTACK_LEFT) {

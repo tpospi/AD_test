@@ -15,8 +15,8 @@ public class SFEngine {
 																// tlacitek
 	public static final int SPLASH_SCREEN_MUSIC = R.raw.warfieldedit; // muzika
 																		// menu
-	public static final int R_VOLUME = 0; // hlasitost
-	public static final int L_VOLUME = 0; // hlasitost
+	public static final int R_VOLUME = 5; // hlasitost
+	public static final int L_VOLUME = 5; // hlasitost
 	public static final boolean LOOP_BACKGROUND_MUSIC = true; // loop ano ne
 	public static final int BACKGROUND_LAYER_ONE = R.drawable.backgroundstars; // textura
 	public static final float SCROLL_BACKGROUND_1 = .002f;
@@ -30,7 +30,7 @@ public class SFEngine {
 	public static final int PLAYER_RELEASE = 3; // akce kterou player provadi
 	public static final int PLAYER_BANK_RIGHT_1 = 4; // akce kterou player
 														// provadi
-	public static final int PLAYER_FRAMES_BETWEEN_ANI = 9; // 9 iteraci herniho
+	public static final int PLAYER_FRAMES_BETWEEN_ANI = 50; // 9 iteraci herniho
 															// cyklu se nakresli
 															// jeden snimek
 	public static final float PLAYER_BANK_SPEED = 0.1f; // rychlost zleva

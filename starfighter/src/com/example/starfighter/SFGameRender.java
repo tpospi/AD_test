@@ -111,7 +111,7 @@ public class SFGameRender implements Renderer {
 					gl.glMatrixMode(GL10.GL_MODELVIEW);
 					gl.glLoadIdentity();
 					gl.glPushMatrix();
-					gl.glScalef(0.25f, 0.25f, 0.25f);
+					gl.glScalef(0.1f, 0.1f, 0.1f);
 					gl.glTranslatef(playerFire[x].posX, playerFire[x].posY, 0f);
 					
 					gl.glMatrixMode(GL10.GL_TEXTURE);
@@ -284,7 +284,7 @@ public class SFGameRender implements Renderer {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glPushMatrix();
-			gl.glScalef(0.25f, 0.25f, 1f);
+			gl.glScalef(0.1f, 0.1f, 1f);
 			// pohyb
 			if (SFEngine.playerBankPosX > 0
 					&& goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // testovani kde je hrac
@@ -327,9 +327,9 @@ public class SFGameRender implements Renderer {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glPushMatrix();
-			gl.glScalef(0.25f, 0.25f, 1f);
+			gl.glScalef(0.1f, 0.1f, 1f);
 			// pohyb
-			if (SFEngine.playerBankPosX < 3
+			if (SFEngine.playerBankPosX < 9
 					&& goodGuyBankFrames < SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // testovani
 				// kde
 				// je
@@ -344,7 +344,7 @@ public class SFGameRender implements Renderer {
 
 				goodGuyBankFrames += 1; // inkrementace pro zjisteni na to kdy
 				// prejit na dalsi sprit
-			} else if (SFEngine.playerBankPosX < 3
+			} else if (SFEngine.playerBankPosX < 9
 					&& goodGuyBankFrames >= SFEngine.PLAYER_FRAMES_BETWEEN_ANI) { // pokud neni na kraji ale uplynulo 9 snimku - naklon cislo 2
 				SFEngine.playerBankPosX += SFEngine.PLAYER_BANK_SPEED;
 				gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f);
@@ -373,7 +373,7 @@ public class SFGameRender implements Renderer {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glPushMatrix();
-			gl.glScalef(0.25f, 0.25f, 1f); // scale hrace na 25procent
+			gl.glScalef(0.1f, 0.1f, 1f); // scale hrace na 25procent
 			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f); // pozice
 			// aktualni.
 			// nedochazi k
@@ -392,7 +392,7 @@ public class SFGameRender implements Renderer {
 			gl.glMatrixMode(GL10.GL_MODELVIEW);
 			gl.glLoadIdentity();
 			gl.glPushMatrix();
-			gl.glScalef(0.25f, 0.25f, 1f); // scale hrace na 25procent
+			gl.glScalef(0.1f, 0.1f, 1f); // scale hrace na 25procent
 			gl.glTranslatef(SFEngine.playerBankPosX, 0f, 0f); // pozice
 			// aktualni.
 			// nedochazi k
@@ -481,6 +481,8 @@ public class SFGameRender implements Renderer {
 		scrollBackground2(gl);// pohyb druheho pozadi
 		movePlayer1(gl); // pohyb postavy
 		moveEnemy(gl);
+		
+		detectCollision();
 
 		gl.glEnable(GL10.GL_BLEND);// zobrazeni prhlednosti
 		gl.glBlendFunc(GL10.GL_ONE, GL10.GL_ONE); // zobrazeni prhlednosti
@@ -536,6 +538,41 @@ public class SFGameRender implements Renderer {
 				SFEngine.context);/* nahreajeme texturu pozadi */
 		//player1.loadTexture(gl, SFEngine.PLAYER_SHIP, SFEngine.context);/** nahreajeme texturu pozadi*/
 
+	}
+	
+	private void detectCollision(){
+		for (int y = 0; y < 3; y++){ //všechny støely
+			if (playerFire[y].shotFired){
+				for (int x=0; x< SFEngine.TOTAL_INTERCEPTORS + SFEngine.TOTAL_SCOUTS + SFEngine.TOTAL_WARSHIPS; x++){
+					if(!enemies[x].isDestroyed && enemies[x].posY<4.25){ //potvora neni jeste znicena a je na obrazovce
+						//test kolize
+						if ((playerFire[y].posY >= enemies[x].posY -1 &&
+							playerFire[y].posY <= enemies[x].posY	)&&
+							(playerFire[y].posX <= enemies[x].posX +1 &&
+							playerFire[y].posX >= enemies[x].posX - 1)){
+							
+							int nextShot = 0;
+							
+							enemies[x].applyDamage();
+							playerFire[y].shotFired = false;
+							if (y==3){
+								nextShot = 0;
+								
+							}
+							else {
+								nextShot = y+1;
+							}
+							
+							if (playerFire[nextShot].shotFired == false){
+								playerFire[nextShot].shotFired = true;
+								playerFire[nextShot].posX = SFEngine.playerBankPosX;
+								playerFire[nextShot].posY = 1.25f;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 }
